@@ -1,28 +1,40 @@
-<!-- pages/chat.vue -->
-
 <template>
-  <div class="chat-container">
-    <h1>ChatGPT Clone</h1>
-    <div class="chat-window" ref="chatWindow">
-      <div v-for="(msg, index) in messages" :key="index" :class="['message', msg.role]">
-        <div class="message-content">{{ msg.content }}</div>
+  <div class="flex flex-col items-center justify-center bg-white p-4">
+    <!-- 打字机效果的标题 -->
+    <h1 class="typing text-2xl font-bold mb-8">有什么可以帮忙的？</h1>
+
+    <!-- 聊天框 -->
+    <div ref="chatWindow" class="chatbox w-full max-w-xl border border-gray-300 rounded-lg p-4 h-[600px] overflow-y-auto">
+      <div v-for="(message, index) in messages" :key="index" :class="message.role === 'user' ? 'text-right' : 'text-left'">
+        <p :class="message.role === 'user' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'"
+           class="inline-block px-4 py-2 rounded-lg mb-2 max-w-[80%]">{{ message.content }}</p>
       </div>
+      <p v-if="loading" class="text-center text-gray-500">正在输入...</p>
+      <p v-if="error" class="text-center text-red-500">{{ error }}</p>
     </div>
-    <form @submit.prevent="sendMessage" class="input-form">
-      <input
-        v-model="inputMessage"
-        type="text"
-        placeholder="Type your message..."
-        :disabled="loading"
-      />
-      <button type="submit" :disabled="loading || !inputMessage.trim()">Send</button>
-    </form>
-    <div v-if="error" class="error">{{ error }}</div>
+
+    <!-- 输入框和发送按钮 -->
+    <div class="w-full max-w-xl flex mt-4">
+      <input v-model="inputMessage" @keyup.enter="sendMessage" type="text" placeholder="请输入消息..."
+             class="w-full border border-gray-300 rounded-l-lg p-2 focus:outline-none focus:border-blue-500" />
+      <button @click="sendMessage" 
+              class="bg-blue-500 text-white px-6 rounded-r-lg hover:bg-blue-600 transition-colors">
+        发送
+      </button>
+    </div>
+
+    <!-- 底部提示信息 -->
+    <p class="text-gray-500 text-sm mt-4">ChatGPT 也可能会犯错。请核查重要信息。</p>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+
+// 正确指定使用的布局
+definePageMeta({
+  layout: 'custom'
+})
 
 const messages = ref([
   { role: 'assistant', content: 'Hello! How can I assist you today?' }
@@ -32,10 +44,10 @@ const loading = ref(false)
 const error = ref(null)
 const chatWindow = ref(null)
 
+// 发送消息函数
 const sendMessage = async () => {
   if (!inputMessage.value.trim()) return
 
-  // Add user message
   messages.value.push({ role: 'user', content: inputMessage.value })
   const userMessage = inputMessage.value
   inputMessage.value = ''
@@ -43,7 +55,6 @@ const sendMessage = async () => {
   loading.value = true
 
   try {
-    // 使用 fetch 请求 API 路由
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -52,22 +63,24 @@ const sendMessage = async () => {
       body: JSON.stringify({ message: userMessage })
     })
 
-    if (!response.ok) throw new Error('API 请求失败')
+    if (!response.ok) throw new Error('API request failed')
 
     const data = await response.json()
     messages.value.push({ role: 'assistant', content: data.choices[0].message.content })
   } catch (err) {
-    console.error("Fetch 错误:", err)
-    error.value = err.message || '请求错误，请稍后再试。'
+    console.error("Error:", err)
+    error.value = err.message || 'Request failed. Please try again later.'
   } finally {
     loading.value = false
   }
 }
 
-// 自动滚动到最新消息
+// 滚动聊天框到底部
 watch(messages, () => {
   if (chatWindow.value) {
-    chatWindow.value.scrollTop = chatWindow.value.scrollHeight
+    setTimeout(() => {
+      chatWindow.value.scrollTop = chatWindow.value.scrollHeight
+    }, 100)
   }
 })
 
@@ -79,84 +92,26 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.chat-container {
-  max-width: 600px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+/* 打字机效果 */
+.typing {
+  border-right: 2px solid black;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: typing 2s steps(20, end), blink 0.5s step-end infinite;
 }
 
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
 }
 
-.chat-window {
-  height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  background-color: #fff;
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: black; }
 }
 
-.message {
-  margin-bottom: 15px;
-  display: flex;
-}
-
-.message.assistant {
-  justify-content: flex-start;
-}
-
-.message.user {
-  justify-content: flex-end;
-}
-
-.message-content {
-  max-width: 80%;
-  padding: 10px 15px;
-  border-radius: 20px;
-  background-color: #e1f5fe;
-  position: relative;
-}
-
-.message.user .message-content {
-  background-color: #c8e6c9;
-}
-
-.input-form {
-  display: flex;
-  margin-top: 15px;
-}
-
-.input-form input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.input-form button {
-  padding: 10px 20px;
-  margin-left: 10px;
-  border: none;
-  background-color: #42b983;
-  color: white;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.input-form button:disabled {
-  background-color: #a5d6a7;
-  cursor: not-allowed;
-}
-
-.error {
-  margin-top: 10px;
-  color: red;
-  text-align: center;
+/* 聊天框样式 */
+.chatbox {
+  resize: vertical;
 }
 </style>

@@ -10,6 +10,10 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@alicloud/openapi-client": "^0.4.7",
+    "@alicloud/openapi-util": "^0.3.2",
+    "@alicloud/tea-util": "^1.4.7",
+    "@alicloud/tea-typescript": "^1.8.0",
     "@nuxtjs/axios": "^5.13.6",
     "@nuxtjs/tailwindcss": "^6.12.0",
     "@pinia/nuxt": "^0.5.4",
@@ -30,6 +34,10 @@
     "@vite-pwa/nuxt": "^0.8.1",
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.38",
-    "tailwindcss": "^3.4.4"
+    "tailwindcss": "^3.4.4",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0",
+    "@nuxt/types": "^2.15.8"
   }
 }
+

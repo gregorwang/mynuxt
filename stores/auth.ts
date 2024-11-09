@@ -14,6 +14,24 @@ export const useAuthStore = defineStore('auth', {
     },
     logout() {
       this.isAuthenticated = false;
+    },
+    async authenticateWithSms(phone: string, code: string) {
+      try {
+        const response = await fetch('/api/auth/sms/verify', {
+          method: 'POST',
+          body: JSON.stringify({ phone, code })
+        });
+        const result = await response.json();
+        
+        if (result.success) {
+          this.isAuthenticated = true;
+          return true;
+        }
+        return false;
+      } catch (error) {
+        console.error('SMS authentication failed:', error);
+        return false;
+      }
     }
   },
 });

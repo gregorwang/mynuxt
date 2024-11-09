@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-gray-100 min-h-screen relative">
+  <div class="bg-gray-100 min-h-screen flex flex-col pb-40">
     <h1 class="text-6xl font-bold gradient-text text-center p-10">最喜欢的游戏</h1>
-    <div class="m-20 relative">
+    <div class="flex-1 m-20 relative">
       <img :src="sekiroConceptArt" alt="no sense" class="w-full h-auto">
       <div class="size-1/3 absolute transform -translate-y-1/3 translate-x-1/3 transition-transform duration-300 ease-in-out hover:scale-110 cursor-pointer">
         <a href="https://www.bilibili.com/video/BV1hY4y1f7Jk/?spm_id_from=333.999.0.0" target="_blank">
@@ -19,6 +19,9 @@
 </template>
 
 <script>
+definePageMeta({
+  layout: 'custom'
+});
 import sekiroConceptArt from '@/assets/Sekiro-conceptart-14.jpg';
 import sekiro24 from '@/assets/Sekiro_24.jpg';
 
@@ -40,6 +43,9 @@ export default {
   -webkit-text-fill-color: transparent;
 }
 </style>
+
+
+
 
 
 

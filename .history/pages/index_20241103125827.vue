@@ -5,7 +5,7 @@
         class="hero bg-cover bg-center bg-no-repeat w-full h-screen relative text-white text-center transition-all duration-500"
         :style="{ backgroundImage: `url(${images[currentImageIndex].src})` }"
       >
-
+       
         <div
           class="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent p-5"
         >
@@ -133,7 +133,7 @@ useSeoMeta({
   // ... 其他可能的SEO元数据属性
 });
 definePageMeta({
-  layout: 'custom'
+  layout: 'd' // 指定使用 d.vue 布局
 });
 
 import { ref, onMounted } from 'vue'
@@ -149,6 +149,12 @@ import qr125 from '~/assets/125.png'
 import yhjImage from '~/assets/yhj.jpg'
 import pexelsPokRieImage from '~/assets/pexels-pok-rie-33563-2049422.jpg'
 import pexelsArnieChouImage from '~/assets/pexels-arnie-chou-304906-1229042.jpg'
+import image1 from '~/assets/image1.jpg'
+import image2 from '~/assets/image2.png'
+import image3 from '~/assets/image3.png'
+import image4 from '~/assets/image4.jpg'
+import image5 from '~/assets/image5.jpg'
+import image6 from '~/assets/image6.jpg'
 
 
 const currentImageIndex = ref(0)
@@ -167,7 +173,50 @@ const images = ref([
   },
 ])
 
-
+const galleryItems = ref([
+  {
+    src: image1,
+    alt: 'Image 1',
+    date: '03月14日 15:14',
+    description: '骑自行车来看胶州湾大桥',
+    source: '来源：个人摄影',
+  },
+  {
+    src: image2,
+    alt: 'Image 2',
+    date: '03月1日 09:13',
+    description: '作死在马路中间拍照',
+    source: '来源：个人摄影',
+  },
+  {
+    src: image3,
+    alt: 'Image 3',
+    date: '01月28日 16:07',
+    description: '给鸽子吃爽了',
+    source: '来源：个人摄影',
+  },
+  {
+    src: image4,
+    alt: 'Image 4',
+    date: '03月29日 15:31',
+    description: '青岛小珠山爬山，很累',
+    source: '来源：个人摄影',
+  },
+  {
+    src: image5,
+    alt: 'Image 5',
+    date: '1月1日 09:29',
+    description: '小区的野猫看起来有点哈人',
+    source: '来源：个人摄影',
+  },
+  {
+    src: image6,
+    alt: 'Image 6',
+    date: '2023年11月29日 16:39',
+    description: '这就是小米手机的画质！',
+    source: '来源：个人摄影',
+  },
+])
 
 const changeImage = (index) => {
   currentImageIndex.value = index
@@ -186,6 +235,7 @@ onMounted(() => {
     router.push('/auth');
   }
 });
+
 </script>
 
 

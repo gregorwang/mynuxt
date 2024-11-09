@@ -5,7 +5,7 @@
         class="hero bg-cover bg-center bg-no-repeat w-full h-screen relative text-white text-center transition-all duration-500"
         :style="{ backgroundImage: `url(${images[currentImageIndex].src})` }"
       >
-
+       
         <div
           class="hero-text absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent p-5"
         >
@@ -22,13 +22,12 @@
             @click="changeImage(index)"
           ></span>
         </div>
-      </div>
-      <div class="title mb-5 relative text-center">
+            <div class="title mb-5 relative text-center">
         <div class="block text-sm mb-1 text-white">FOLLOW ME @SOCIAL MEDIA</div>
         <h2 class="text-xl m-0">关注社交媒体上的我</h2>
       </div>
       <dl class="flex justify-center flex-wrap list-none p-0 m-0">
-        <dd class="m-2 relative">
+        <dd class="m-2 relative qr-container">
           <a href="javascript:;">
             <img
               :src="qqImage"
@@ -37,21 +36,21 @@
             />
           </a>
           <div
-            class="layer hidden absolute top-14 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 border border-gray-300 p-2 z-10 text-center"
+            class="qr-content absolute top-14 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 border border-gray-300 p-2 z-10 text-center"
           >
             <div class="ewm text-center">
               <div class="img">
                 <img
                   :src="qr198"
                   alt="QR Code"
-                  class="w-48 h-48"
+                  class="w-48 h-48 object-contain"
                 />
               </div>
               <div class="name mt-2 text-sm text-gray-800">个人QQ</div>
             </div>
           </div>
         </dd>
-        <dd class="m-2 relative">
+        <dd class="m-2 relative qr-container">
           <a href="javascript:;">
             <img
               :src="wechatImage"
@@ -60,14 +59,14 @@
             />
           </a>
           <div
-            class="layer hidden absolute top-14 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 border border-gray-300 p-2 z-10 text-center"
+            class="qr-content absolute top-14 left-1/2 transform -translate-x-1/2 bg-white text-gray-800 border border-gray-300 p-2 z-10 text-center"
           >
             <div class="ewm text-center">
               <div class="img">
                 <img
                   :src="qr125"
                   alt="QR Code"
-                  class="w-48 h-48"
+                  class="w-48 h-48 object-contain"
                 />
               </div>
               <div class="name mt-2 text-sm text-gray-800">个人微信</div>
@@ -127,13 +126,13 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  layout: 'custom'
+});
 useSeoMeta({
   title: '汪家俊的个人网站',
   description: '个人网页练习',
   // ... 其他可能的SEO元数据属性
-});
-definePageMeta({
-  layout: 'custom'
 });
 
 import { ref, onMounted } from 'vue'
@@ -149,10 +148,19 @@ import qr125 from '~/assets/125.png'
 import yhjImage from '~/assets/yhj.jpg'
 import pexelsPokRieImage from '~/assets/pexels-pok-rie-33563-2049422.jpg'
 import pexelsArnieChouImage from '~/assets/pexels-arnie-chou-304906-1229042.jpg'
+import image1 from '~/assets/image1.jpg'
+import image2 from '~/assets/image2.png'
+import image3 from '~/assets/image3.png'
+import image4 from '~/assets/image4.jpg'
+import image5 from '~/assets/image5.jpg'
+import image6 from '~/assets/image6.jpg'
 
 
-const currentImageIndex = ref(0)
-const images = ref([
+const currentImageIndex = ref<number>(0)
+const images = ref<Array<{
+  src: string;
+  text: string;
+}>>([
   {
     src: yhjImage,
     text: '本网站云服务器由谷歌公司提供3个月的免费试用，感谢他们，薅完谷歌的羊毛再准备薅aws了',
@@ -169,11 +177,11 @@ const images = ref([
 
 
 
-const changeImage = (index) => {
+const changeImage = (index: number): void => {
   currentImageIndex.value = index
 }
 
-const showAlert = () => {
+const showAlert = (): void => {
   alert('正在开发中请耐心等待')
 }
 
@@ -186,6 +194,7 @@ onMounted(() => {
     router.push('/auth');
   }
 });
+
 </script>
 
 
@@ -265,5 +274,31 @@ dl dd:hover .layer {
 }
 .info p {
   @apply my-1.5;
+}
+
+.qr-content {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  width: auto;
+  height: auto;
+}
+
+.qr-container:hover .qr-content {
+  display: block;
+  opacity: 1;
+}
+
+.qr-content .img {
+  width: 192px; /* w-48 = 12rem = 192px */
+  height: 192px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.qr-content {
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 </style>
