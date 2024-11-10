@@ -72,16 +72,28 @@ const countdown = ref(0);
 
 // 密码登录
 const loginWithPassword = () => {
+  console.log('尝试登录，密码:', password.value);
+
+  if (!password.value) {
+    errorMessage.value = '请输入密码';
+    return;
+  }
+
   const success = authStore.authenticate(password.value);
+  console.log('认证结果:', success);
+
   if (success) {
+    console.log('登录成功，准备跳转');
     // 如果有手机号，也保存手机号
     if (phoneNumber.value) {
       authStore.setAuthenticated(true, phoneNumber.value);
     } else {
       authStore.setAuthenticated(true);
     }
+    errorMessage.value = '登录成功！';
     router.push('/');
   } else {
+    console.log('登录失败，密码错误');
     errorMessage.value = '密码错误，请重试。';
   }
 };
@@ -94,7 +106,7 @@ const sendSmsCode = async () => {
   }
 
   try {
-    const response = await fetch('http://localhost:5000/send-sms', {
+    const response = await fetch('http://121.199.73.119:5000/send-sms', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -136,7 +148,7 @@ const loginWithSms = async () => {
 
   try {
     // 调用验证码验证接口
-    const response = await fetch('http://localhost:5000/verify-sms', {
+    const response = await fetch('http://121.199.73.119:5000/verify-sms', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

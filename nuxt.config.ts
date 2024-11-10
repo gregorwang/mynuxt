@@ -7,7 +7,13 @@ export default defineNuxtConfig({
       enabled: true
     }
   },
-
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      ]
+    }
+  }, 
   modules: [
     "@nuxtjs/tailwindcss",
     "@nuxt/fonts",
