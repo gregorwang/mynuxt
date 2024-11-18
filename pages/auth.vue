@@ -59,6 +59,13 @@
 import { ref } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
+
+// 在这里定义API相关的常量
+const BASE_URL = 'http://127.0.0.1:8000/asl/';
+const API_KEY = '1234567890';
+const SMS_SEND_URL = `${BASE_URL}sms/send/`;
+const SMS_VERIFY_URL = `${BASE_URL}sms/verify/`;
+
 const authStore = useAuthStore();
 const router = useRouter();
 
@@ -106,15 +113,15 @@ const sendSmsCode = async () => {
   }
 
   try {
-    const response = await fetch('http://121.199.73.119:5000/send-sms', {
+    const response = await fetch(SMS_SEND_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-API-Key': 1234567890,
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
-        phone_number: phoneNumber.value,
-        sign_name: '汪家俊的个人网站',  // 使用您配置的签名
-        template_code: 'SMS_306490979'  // 使用您配置的模板代码
+        phone_number: phoneNumber.value
       })
     });
     
@@ -147,11 +154,12 @@ const loginWithSms = async () => {
   }
 
   try {
-    // 调用验证码验证接口
-    const response = await fetch('http://121.199.73.119:5000/verify-sms', {
+    const response = await fetch(SMS_VERIFY_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-API-Key': 1234567890,
+        'Accept': 'application/json'
       },
       body: JSON.stringify({
         phone_number: phoneNumber.value,
