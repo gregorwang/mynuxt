@@ -42,6 +42,9 @@
             <li>
               <NuxtLink to="/chat" class="nav-link">LLM-ft-person</NuxtLink>
             </li>
+            <li>
+              <NuxtLink to="/todolist" class="nav-link">Todo List</NuxtLink>
+            </li>
           </ul>
         </div>
       </div>

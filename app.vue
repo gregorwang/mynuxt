@@ -1,7 +1,6 @@
 <template>
   <div>
     <NuxtLayout>
-      <NavBar />
       <NuxtPage />
     </NuxtLayout>
   </div>
@@ -11,7 +10,7 @@
 import { onMounted, watch } from 'vue';
 import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
-import NavBar from '~/components/NavBar.vue';
+
 
 const authStore = useAuthStore();
 const router = useRouter();
