@@ -2,11 +2,14 @@
   <div :style="backgroundStyle" class="bg-cover bg-center min-h-screen">
     <div class="message-board">
       <h1 class="title">留言板</h1>
-      <form @submit.prevent="submitMessage" class="message-form">
-        <div class="form-group">
-          <label for="username">用户名</label>
-          <input type="text" v-model="name" id="username" class="input-field" required />
-        </div>
+      
+      <!-- 如果未登录，显示提示 -->
+      <div v-if="!authStore.isAuthenticated" class="login-prompt">
+        <p>请先<router-link to="/auth" class="login-link">登录</router-link>后再发送留言</p>
+      </div>
+
+      <!-- 登录后显示留言表单 -->
+      <form v-else @submit.prevent="submitMessage" class="message-form">
         <div class="form-group">
           <label for="content">留言内容</label>
           <div class="textarea-wrapper">
@@ -73,7 +76,7 @@
           </div>
           <div class="message-content">
             <div class="message-header">
-              <span class="username">{{ msg.name }}</span>
+              <span class="username">{{ formatPhoneNumber(msg.user_phone) }}</span>
               <span class="timestamp">{{ formatDate(msg.timestamp) }}</span>
             </div>
             <div class="message-text">{{ msg.content }}</div>
@@ -90,157 +93,209 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue';  // 添加必要的imports
+import { useAuthStore } from '~/stores/auth';
 import avatarUrl from "@/assets/ybtm.jpg";
 import backgroundUrl from "@/assets/shab.jpg";
 
-export default {
-  data() {
-    return {
-      name: "",
-      message: "",
-      messages: [],
-      avatarUrl,
-      backgroundStyle: {
-        backgroundImage: `url(${backgroundUrl})`,
-      },
-      loading: false,
-      loadingMessages: false,
-      error: null,
-      currentPage: 1,
-      itemsPerPage: 5,
-      showEmojiPicker: false,
-      emojiCurrentPage: 1,
-      emojisPerPage: 20, // 每页显示的表情数量
-      emojis: [
-        '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', 
-        '😉', '😍', '🥰', '😘', '😗', '😚', '😋', '😛', '😜', '🤪',
-        '😝', '🤗', '🤭', '🤫', '🤔', '🤐', '🤨', '😐', '😑', '😶',
-        '👍', '👎', '👌', '✌️', '🤞', '🤟', '🤘', '🤙', '👈', '👉',
-        '❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💖',
-        '✨', '⭐', '🌟', '💫', '💥', '💢', '💦', '💨', '🕊️', '🎵',
-        '🐱', '🐶', '🐼', '🐨', '🦊', '🦁', '🐯', '🐮', '🐷', '🐸',
-        '🍎', '🍓', '🍒', '🍕', '🍔', '🍟', '🍖', '🍗', '🍜', '☕'
-      ]
-    };
-  },
-  computed: {
-    paginatedMessages() {
-      const start = (this.currentPage - 1) * this.itemsPerPage;
-      return this.messages.slice(start, start + this.itemsPerPage);
-    },
-    totalPages() {
-      return Math.ceil(this.messages.length / this.itemsPerPage);
-    },
-    emojiTotalPages() {
-      return Math.ceil(this.emojis.length / this.emojisPerPage);
-    },
-    currentPageEmojis() {
-      const start = (this.emojiCurrentPage - 1) * this.emojisPerPage;
-      const end = start + this.emojisPerPage;
-      return this.emojis.slice(start, end);
+const authStore = useAuthStore();
+const router = useRouter();
+
+// API配置
+const BASE_URL = 'http://127.0.0.1:8000/asl/';
+const API_KEY = '1234567890';
+const MESSAGES_URL = `${BASE_URL}messages/`;
+
+// 响应式变量
+const messages = ref([]);
+const message = ref('');
+const loading = ref(false);
+const loadingMessages = ref(false);
+const error = ref(null);
+const currentPage = ref(1);
+const pageSize = ref(5);
+const showEmojiPicker = ref(false);
+const emojiCurrentPage = ref(1);
+const emojisPerPage = 15;
+
+// 背景样式
+const backgroundStyle = {
+  backgroundImage: `url(${backgroundUrl})`
+};
+
+// 计算属性
+const totalPages = computed(() => Math.ceil(messages.value.length / pageSize.value));
+const paginatedMessages = computed(() => {
+  return messages.value.slice(
+    (currentPage.value - 1) * pageSize.value,
+    currentPage.value * pageSize.value
+  );
+});
+
+// 表情相关
+const emojis = ['😊', '😂', '🤣', '❤️', '😍', '🥰', '😘', '😭', '😅', '😉', '🤔', '😴', '🥺', '😎', '🤗'];
+const emojiTotalPages = Math.ceil(emojis.length / emojisPerPage);
+const currentPageEmojis = computed(() => {
+  const start = (emojiCurrentPage.value - 1) * emojisPerPage;
+  return emojis.slice(start, start + emojisPerPage);
+});
+
+// 方法
+const fetchMessages = async () => {
+  loadingMessages.value = true;
+  try {
+    const csrfToken = getCsrfToken();
+    const response = await fetch(MESSAGES_URL, {
+      credentials: 'include',
+      headers: {
+        'X-API-Key': API_KEY.toString(),
+        'Accept': 'application/json',
+        'X-Phone-Number': authStore.phoneNumber || '',  // 确保即使为空也发送
+        'X-CSRFToken': csrfToken || '',  // 确保即使为空也发送
+      }
+    });
+    const result = await response.json();
+    if (result.success) {
+      messages.value = result.data;
     }
-  },
-  created() {
-    this.fetchMessages();
-  },
-  methods: {
-    async fetchMessages() {
-      this.loadingMessages = true;
-      this.error = null;
-      try {
-        const response = await $fetch("/api/messages");
-        console.log(response); // 调试用，查看 API 返回的数据
-        if (response.success) {
-          this.messages = response.data;
-        } else {
-          this.error = response.error;
-        }
-      } catch (error) {
-        console.error("Error fetching messages:", error);
-        this.error = "无法加载留言，请稍后重试。";
-      } finally {
-        this.loadingMessages = false;
-      }
-    },
-    async submitMessage() {
-      if (!this.name.trim() || !this.message.trim()) {
-        this.error = "用户名和留言内容不能为空。";
-        return;
-      }
-      this.loading = true;
-      this.error = null;
-      const newMessage = {
-        name: this.name,
-        content: this.message,
-      };
-      try {
-        const response = await $fetch("/api/messages", {
-          method: "POST",
-          body: newMessage,
-        });
-        if (response.success) {
-          this.name = "";
-          this.message = "";
-          this.fetchMessages();
-        } else {
-          this.error = response.error;
-        }
-      } catch (error) {
-        console.error("Error submitting message:", error);
-        this.error = "留言提交失败，请稍后重试。";
-      } finally {
-        this.loading = false;
-      }
-    },
-    nextPage() {
-      if (this.currentPage < this.totalPages) {
-        this.currentPage++;
-      }
-    },
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-      }
-    },
-    formatDate(timestamp) {
-      return new Date(timestamp).toLocaleString();
-    },
-    toggleEmojiPicker() {
-      this.showEmojiPicker = !this.showEmojiPicker;
-      if (this.showEmojiPicker) {
-        this.emojiCurrentPage = 1; // 重置到第一页
-      }
-    },
-    prevEmojiPage() {
-      if (this.emojiCurrentPage > 1) {
-        this.emojiCurrentPage--;
-      }
-    },
-    nextEmojiPage() {
-      if (this.emojiCurrentPage < this.emojiTotalPages) {
-        this.emojiCurrentPage++;
-      }
-    },
-    addEmoji(emoji) {
-      this.message += emoji;
-      this.showEmojiPicker = false;
-    },
-    handleClickOutside(event) {
-      const picker = document.querySelector('.emoji-picker');
-      const trigger = document.querySelector('.emoji-trigger');
-      
-      if (picker && !picker.contains(event.target) && !trigger.contains(event.target)) {
-        this.showEmojiPicker = false;
-      }
-    }
-  },
-  mounted() {
-    document.addEventListener('click', this.handleClickOutside);
-  },
-  beforeUnmount() {
-    document.removeEventListener('click', this.handleClickOutside);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+  } finally {
+    loadingMessages.value = false;
   }
+};
+
+const formatDate = (timestamp) => {
+  return new Date(timestamp).toLocaleString();
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) currentPage.value--;
+};
+
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+};
+
+const toggleEmojiPicker = () => {
+  showEmojiPicker.value = !showEmojiPicker.value;
+};
+
+const addEmoji = (emoji) => {
+  message.value += emoji;
+};
+
+const prevEmojiPage = () => {
+  if (emojiCurrentPage.value > 1) emojiCurrentPage.value--;
+};
+
+const nextEmojiPage = () => {
+  if (emojiCurrentPage.value < emojiTotalPages) emojiCurrentPage.value++;
+};
+
+// 组件挂载时获取消息
+onMounted(async () => {
+  try {
+    // 先查登录状态
+    if (!authStore.isAuthenticated) {
+      console.log('User not authenticated');
+      return;
+    }
+
+    console.log('User authenticated with phone:', authStore.phoneNumber); // 添加调试信息
+
+    // 获取 CSRF token
+    await fetch(`${BASE_URL}get-csrf-token/`, {
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json',
+      }
+    });
+    
+    await fetchMessages();
+  } catch (error) {
+    console.error('Error during initialization:', error);
+  }
+});
+
+// 在提交留言前检查登录状态
+const submitMessage = async () => {
+  if (!authStore.isAuthenticated || !authStore.phoneNumber) {
+    alert('请先登录后再发送留言');
+    router.push('/auth');
+    return;
+  }
+
+  console.log('Submitting message with phone:', authStore.phoneNumber); // 添加调试信息
+
+  if (!message.value.trim()) {
+    error.value = "留言内容不能为空";
+    return;
+  }
+
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const csrfToken = getCsrfToken();
+    if (!csrfToken) {
+      // 如果没有 CSRF token，重新获取
+      await fetch(`${BASE_URL}get-csrf-token/`, {
+        credentials: 'include',
+        headers: {
+          'X-API-Key': API_KEY.toString(),
+          'Accept': 'application/json',
+        }
+      });
+      // 等待一小段时间确保 cookie 已经设置
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    const response = await fetch(MESSAGES_URL, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': API_KEY.toString(),
+        'Accept': 'application/json',
+        'X-Phone-Number': authStore.phoneNumber,
+        'X-CSRFToken': getCsrfToken() || '',
+      },
+      body: JSON.stringify({
+        content: message.value.trim(),
+        phone_number: authStore.phoneNumber
+      })
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      message.value = "";
+      await fetchMessages();
+    } else {
+      error.value = result.error || '提交失败，请重试';
+    }
+  } catch (error) {
+    console.error("Error submitting message:", error);
+    error.value = "留言提交失败，请稍后重试";
+  } finally {
+    loading.value = false;
+  }
+};
+
+// 添加获取 CSRF token 的函数
+const getCsrfToken = () => {
+  return document.cookie
+    .split('; ')
+    .find(row => row.startsWith('csrftoken='))
+    ?.split('=')[1];
+};
+
+// 添加手机号格式化函数
+const formatPhoneNumber = (phone) => {
+  if (!phone) return '';
+  // 显示前3位和后4位，中间用星号代替
+  return phone.substring(0, 3) + '****' + phone.substring(7);
 };
 </script>
 
@@ -385,6 +440,20 @@ textarea.input-field {
   .emoji-btn {
     @apply p-1;
   }
+}
+
+/* 添加新的样式 */
+.login-prompt {
+  @apply text-center py-4 mb-4;
+}
+
+.login-link {
+  @apply text-purple-600 hover:text-purple-800 underline;
+}
+
+/* 可以添加手机号的特殊样式 */
+.phone-number {
+  @apply text-sm text-gray-600 ml-2;
 }
 </style>
 

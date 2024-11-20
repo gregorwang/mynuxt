@@ -172,6 +172,7 @@ const loginWithSms = async () => {
     if (result.success) {
       // 验证成功，设置登录状态并保存手机号
       await authStore.setAuthenticated(true, phoneNumber.value);
+      console.log('登录成功，手机号：', phoneNumber.value);
       errorMessage.value = '登录成功！';
       router.push('/'); // 跳转到首页
     } else {
