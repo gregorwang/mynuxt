@@ -19,7 +19,8 @@ export default defineNuxtConfig({
     "@nuxt/fonts",
     "@nuxtjs/color-mode",
     "@vite-pwa/nuxt",
-    '@pinia/nuxt'
+    '@pinia/nuxt',
+    '@nuxtjs/proxy'
   ],
 
   compatibilityDate: "2024-11-05",
@@ -42,9 +43,9 @@ export default defineNuxtConfig({
     experimental: {
       openAPI: true
     },
-    devProxy: {
+    proxy: {
       '/api/sms': {
-        target: 'http://localhost:5000',
+        target: process.env.API_BASE_URL || 'http://121.199.73.119:8080',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/sms/, '')
       }
