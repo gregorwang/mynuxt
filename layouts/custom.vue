@@ -45,6 +45,9 @@
             <li>
               <NuxtLink to="/todolist" class="nav-link">Todo List</NuxtLink>
             </li>
+            <li>
+              <NuxtLink to="/admin-access" class="nav-link">Admin Access</NuxtLink>
+            </li>
           </ul>
         </div>
       </div>

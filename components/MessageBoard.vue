@@ -103,7 +103,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 // API配置
-const BASE_URL = 'http://127.0.0.1:8000/asl/';
+const BASE_URL = 'http://121.199.73.119:8080/asl/';
 const API_KEY = '1234567890';
 const MESSAGES_URL = `${BASE_URL}messages/`;
 
@@ -127,14 +127,23 @@ const backgroundStyle = {
 // 计算属性
 const totalPages = computed(() => Math.ceil(messages.value.length / pageSize.value));
 const paginatedMessages = computed(() => {
-  return messages.value.slice(
+  // 首先对消息进行排序（最新的在前面）
+  const sortedMessages = [...messages.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  return sortedMessages.slice(
     (currentPage.value - 1) * pageSize.value,
     currentPage.value * pageSize.value
   );
 });
 
 // 表情相关
-const emojis = ['😊', '😂', '🤣', '❤️', '😍', '🥰', '😘', '😭', '😅', '😉', '🤔', '😴', '🥺', '😎', '🤗'];
+const emojis = [
+  '😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰',
+  '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🥸', '🤩',
+  '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢',
+  '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🫣',
+  '🤗', '🫡', '🤔', '🫢', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🫠', '🙄', '😯', '😦',
+  '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🫥', '🤐', '🥴', '🤢', '🤮', '🤧', '😷'
+];
 const emojiTotalPages = Math.ceil(emojis.length / emojisPerPage);
 const currentPageEmojis = computed(() => {
   const start = (emojiCurrentPage.value - 1) * emojisPerPage;

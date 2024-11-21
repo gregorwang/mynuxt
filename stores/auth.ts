@@ -47,6 +47,18 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    // 添加密码登录方法
+    async authenticateWithPassword(phone: string, password: string): Promise<boolean> {
+      // 这里设置一个固定的密码，您可以根据需要修改
+      const ADMIN_PASSWORD = 'admin123';
+      
+      if (password === ADMIN_PASSWORD) {
+        this.setAuthenticated(true, phone);
+        return true;
+      }
+      return false;
+    },
+
     // 设置认证状态
     setAuthenticated(value: boolean, phoneNumber: string | null = null) {
       console.log('Setting authenticated:', { value, phoneNumber });

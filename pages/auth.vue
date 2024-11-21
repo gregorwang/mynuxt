@@ -19,7 +19,19 @@
 
     <!-- 密码登录表单 -->
     <div v-if="loginType === 'password'" class="login-form">
-      <input v-model="password" type="password" placeholder="输入密码" />
+      <div class="phone-input">
+        <input 
+          v-model="phoneNumber" 
+          type="text" 
+          placeholder="输入手机号"
+          maxlength="11"
+        />
+      </div>
+      <input 
+        v-model="password" 
+        type="password" 
+        placeholder="输入密码" 
+      />
       <button @click="loginWithPassword">登录</button>
     </div>
 
@@ -61,7 +73,7 @@ import { useAuthStore } from '~/stores/auth';
 import { useRouter } from 'vue-router';
 
 // 在这里定义API相关的常量
-const BASE_URL = 'http://127.0.0.1:8000/asl/';
+const BASE_URL = 'http://121.199.73.119:8080//asl/';
 const API_KEY = '1234567890';
 const SMS_SEND_URL = `${BASE_URL}sms/send/`;
 const SMS_VERIFY_URL = `${BASE_URL}sms/verify/`;
@@ -78,30 +90,30 @@ const errorMessage = ref('');
 const countdown = ref(0);
 
 // 密码登录
-const loginWithPassword = () => {
-  console.log('尝试登录，密码:', password.value);
+const loginWithPassword = async () => {
+  // 验证手机号格式
+  if (!/^1[3-9]\d{9}$/.test(phoneNumber.value)) {
+    errorMessage.value = '请输入正确的手机号';
+    return;
+  }
 
   if (!password.value) {
     errorMessage.value = '请输入密码';
     return;
   }
 
-  const success = authStore.authenticate(password.value);
-  console.log('认证结果:', success);
-
-  if (success) {
-    console.log('登录成功，准备跳转');
-    // 如果有手机号，也保存手机号
-    if (phoneNumber.value) {
-      authStore.setAuthenticated(true, phoneNumber.value);
+  try {
+    const success = await authStore.authenticateWithPassword(phoneNumber.value, password.value);
+    
+    if (success) {
+      errorMessage.value = '登录成功！';
+      router.push('/');
     } else {
-      authStore.setAuthenticated(true);
+      errorMessage.value = '密码错误，请重试。';
     }
-    errorMessage.value = '登录成功！';
-    router.push('/');
-  } else {
-    console.log('登录失败，密码错误');
-    errorMessage.value = '密码错误，请重试。';
+  } catch (error) {
+    console.error('登录错误:', error);
+    errorMessage.value = '登录失败，请重试';
   }
 };
 

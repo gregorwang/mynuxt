@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 // 定义基础 URL 和 API 密钥
-const BASE_URL = 'http://127.0.0.1:8000/asl/todos/';
+const BASE_URL = 'http://121.199.73.119:8080//asl/todos/';
 const API_KEY = '1234567890';
 
 // 获取所有待办事项
