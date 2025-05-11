@@ -95,45 +95,37 @@
 
 <script setup lang="ts">
 // 定义基础 URL 和 API 密钥
-const BASE_URL = 'http://121.199.73.119:8080//asl/todos/';
+const BASE_URL = 'http://121.199.73.119/asl/todos/';
 const API_KEY = '1234567890';
 
 // 获取所有待办事项
 const fetchTodos = async () => {
   try {
     isLoading.value = true;
-    console.log('开始获取待办事项...');
-    
-    // 明确设置所有请求头
-    const requestHeaders = {
-      'Content-Type': 'application/json',
-      'X-API-Key': API_KEY,
-      'Accept': 'application/json'
-    };
-    
-    console.log('请求头:', requestHeaders);  // 调试日志
-    
-    const response = await fetch(BASE_URL, { 
-      method: 'GET',
-      headers: requestHeaders,  // 使用完整的请求头
-      mode: 'cors'  // 明确指定跨域模式
+    const response = await fetch(`${BASE_URL}get_todos/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'X-API-Key': API_KEY,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     });
-    
-    console.log('响应状态:', response.status);
-    
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('错误响应:', errorData);
-      throw new Error(`请求失败: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
-    const data = await response.json();
-    console.log('获取到的数据:', data);
-    todos.value = Array.isArray(data) ? data : [];
-    
-  } catch (err) {
-    error.value = '获取待办事项失败，请稍后重试';
-    console.error('获取待办事项失败:', err);
+
+    const result = await response.json();
+    if (result.success && Array.isArray(result.data)) {
+      todos.value = result.data;
+    } else {
+      console.error('意外的响应格式:', result);
+      todos.value = [];
+    }
+  } catch (error) {
+    console.error('获取待办事项失败:', error);
+    this.error = '获取待办事项失败，请稍后重试';
   } finally {
     isLoading.value = false;
   }
@@ -166,45 +158,35 @@ const addTodo = async () => {
 };
 
 // 更新待办事项状态
-const toggleTodo = async (id: string) => {
+const toggleTodo = async (id) => {
   const todo = todos.value.find(t => t.id === id);
   if (!todo) return;
 
   try {
-    // 明确定义请求头
-    const requestHeaders = {
-      'Content-Type': 'application/json',
-      'X-API-Key': API_KEY,
-      'Accept': 'application/json'
-    };
-
-    console.log('发送更新请求:', {
-      id,
-      currentStatus: todo.completed,
-      newStatus: !todo.completed
-    });
-
-    const response = await fetch(`${BASE_URL}${id}/`, {
-      method: 'PUT',
-      headers: requestHeaders,  // 使用明确定义的请求头
+    const response = await fetch(`${BASE_URL}update_todo/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': API_KEY,
+        'Accept': 'application/json'
+      },
       body: JSON.stringify({
+        id: id,
         ...todo,
         completed: !todo.completed
       })
     });
-    
+
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('更新失败:', errorData);
-      throw new Error(`更新失败: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const data = await response.json();
-    console.log('更新成功:', data);  // 添加成功日志
-    
-    const index = todos.value.findIndex(t => t.id === id);
-    if (index !== -1) {
-      todos.value[index] = data;
+    const result = await response.json();
+    if (result.success) {
+      const index = todos.value.findIndex(t => t.id === id);
+      if (index !== -1) {
+        todos.value[index] = result.data;
+      }
     }
   } catch (error) {
     console.error('更新待办事项失败:', error);

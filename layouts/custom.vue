@@ -33,9 +33,9 @@
               <a href="#" class="nav-link">个人兴趣</a>
               <div class="dropdown-menu">
                 <ul class="dropdown-list">
-                  <li><NuxtLink to="/game" class="dropdown-item">最喜欢的游戏</NuxtLink></li>
+                  <li><NuxtLink to="/line" class="dropdown-item">最喜欢的游戏</NuxtLink></li>
                   <li><NuxtLink to="/Anime" class="dropdown-item">最喜欢的动漫</NuxtLink></li>
-                  <li><NuxtLink to="/dlg" class="dropdown-item">最喜欢的电影电视剧</NuxtLink></li>
+                  <li><NuxtLink to="/streetphotos" class="dropdown-item">最喜欢的电影电视剧</NuxtLink></li>
                 </ul>
               </div>
             </li>

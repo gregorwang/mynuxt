@@ -103,7 +103,7 @@ const authStore = useAuthStore();
 const router = useRouter();
 
 // API配置
-const BASE_URL = 'http://121.199.73.119:8080/asl/';
+const BASE_URL = 'http://121.199.73.119/asl/';
 const API_KEY = '1234567890';
 const MESSAGES_URL = `${BASE_URL}messages/`;
 
@@ -127,8 +127,15 @@ const backgroundStyle = {
 // 计算属性
 const totalPages = computed(() => Math.ceil(messages.value.length / pageSize.value));
 const paginatedMessages = computed(() => {
-  // 首先对消息进行排序（最新的在前面）
-  const sortedMessages = [...messages.value].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  console.log('当前消息列表:', messages.value);  // 添加调试日志
+  if (!Array.isArray(messages.value)) {
+    console.warn('messages 不是数组:', messages.value);
+    return [];
+  }
+  
+  const sortedMessages = [...messages.value].sort(
+    (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
+  );
   return sortedMessages.slice(
     (currentPage.value - 1) * pageSize.value,
     currentPage.value * pageSize.value
@@ -152,24 +159,38 @@ const currentPageEmojis = computed(() => {
 
 // 方法
 const fetchMessages = async () => {
+  console.log('开始获取消息列表...');  // 添加日志
   loadingMessages.value = true;
   try {
-    const csrfToken = getCsrfToken();
+    console.log('发送请求到:', MESSAGES_URL);  // 添加日志
     const response = await fetch(MESSAGES_URL, {
+      method: 'POST',
       credentials: 'include',
       headers: {
         'X-API-Key': API_KEY.toString(),
         'Accept': 'application/json',
-        'X-Phone-Number': authStore.phoneNumber || '',  // 确保即使为空也发送
-        'X-CSRFToken': csrfToken || '',  // 确保即使为空也发送
-      }
+        'Content-Type': 'application/json',
+        'X-Phone-Number': authStore.phoneNumber || '',
+      },
+      body: JSON.stringify({})
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const result = await response.json();
-    if (result.success) {
+    console.log('获取到的消息:', result);
+
+    if (result.success && Array.isArray(result.data)) {
       messages.value = result.data;
+    } else {
+      console.error('意外的响应格式:', result);
+      messages.value = [];
     }
   } catch (error) {
-    console.error('Error fetching messages:', error);
+    console.error('获取消息失败:', error);
+    error.value = '获取消息失败，请稍后重试';
   } finally {
     loadingMessages.value = false;
   }
@@ -206,89 +227,54 @@ const nextEmojiPage = () => {
 // 组件挂载时获取消息
 onMounted(async () => {
   try {
-    // 先查登录状态
-    if (!authStore.isAuthenticated) {
-      console.log('User not authenticated');
-      return;
-    }
-
-    console.log('User authenticated with phone:', authStore.phoneNumber); // 添加调试信息
-
-    // 获取 CSRF token
-    await fetch(`${BASE_URL}get-csrf-token/`, {
-      credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-      }
-    });
+    console.log('组件挂载，开始获取消息');
+    console.log('认证状态:', authStore.isAuthenticated);
+    console.log('用户手机号:', authStore.phoneNumber);
     
     await fetchMessages();
   } catch (error) {
-    console.error('Error during initialization:', error);
+    console.error('初始化失败:', error);
   }
 });
 
 // 在提交留言前检查登录状态
 const submitMessage = async () => {
-  if (!authStore.isAuthenticated || !authStore.phoneNumber) {
-    alert('请先登录后再发送留言');
-    router.push('/auth');
-    return;
-  }
-
-  console.log('Submitting message with phone:', authStore.phoneNumber); // 添加调试信息
-
   if (!message.value.trim()) {
-    error.value = "留言内容不能为空";
+    error.value = "请输入留言内容";
     return;
   }
 
   loading.value = true;
-  error.value = null;
-
   try {
-    const csrfToken = getCsrfToken();
-    if (!csrfToken) {
-      // 如果没有 CSRF token，重新获取
-      await fetch(`${BASE_URL}get-csrf-token/`, {
-        credentials: 'include',
-        headers: {
-          'X-API-Key': API_KEY.toString(),
-          'Accept': 'application/json',
-        }
-      });
-      // 等待一小段时间确保 cookie 已经设置
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    const response = await fetch(MESSAGES_URL, {
+    // 添加调试日志
+    console.log('发送的数据:', {
+      content: message.value,
+      phoneNumber: authStore.phoneNumber
+    });
+    
+    const response = await fetch(`${API_BASE_URL}/messages/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
-        'Content-Type': 'application/json',
         'X-API-Key': API_KEY.toString(),
         'Accept': 'application/json',
-        'X-Phone-Number': authStore.phoneNumber,
-        'X-CSRFToken': getCsrfToken() || '',
+        'Content-Type': 'application/json',
+        'X-Phone-Number': authStore.phoneNumber || '',
       },
       body: JSON.stringify({
-        content: message.value.trim(),
-        phone_number: authStore.phoneNumber
+        content: message.value
       })
     });
 
-    const result = await response.json();
-    if (result.success) {
-      message.value = "";
-      await fetchMessages();
-    } else {
-      error.value = result.error || '提交失败，请重试';
+    // 添加响应调试
+    const responseData = await response.json();
+    console.log('服务器响应:', responseData);
+    
+    if (!response.ok) {
+      throw new Error(responseData.message || '提交失败');
     }
   } catch (error) {
     console.error("Error submitting message:", error);
-    error.value = "留言提交失败，请稍后重试";
-  } finally {
-    loading.value = false;
   }
 };
 
