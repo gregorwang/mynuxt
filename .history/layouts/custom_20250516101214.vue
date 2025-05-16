@@ -46,7 +46,7 @@
               <NuxtLink to="/cv" class="nav-link">个人简历</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/law" class="nav-link">后台管理</NuxtLink>
+              <NuxtLink to="/law" class="nav-link">Admin Access</NuxtLink>
             </li>
           </ul>
         </div>

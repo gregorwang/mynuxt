@@ -20,7 +20,9 @@ export default defineNuxtConfig({
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
     "@vite-pwa/nuxt",
-    "@vueuse/motion/nuxt",
+    modules: [
+  '@vueuse/motion/nuxt'
+
     '@pinia/nuxt'
   ],
 

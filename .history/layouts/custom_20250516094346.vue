@@ -43,10 +43,10 @@
               <NuxtLink to="/chat" class="nav-link">LLM-ft-person</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/cv" class="nav-link">个人简历</NuxtLink>
+              <NuxtLink to="/todolist" class="nav-link">Todo List</NuxtLink>
             </li>
             <li>
-              <NuxtLink to="/law" class="nav-link">后台管理</NuxtLink>
+              <NuxtLink to="/law" class="nav-link">Admin Access</NuxtLink>
             </li>
           </ul>
         </div>
@@ -77,7 +77,17 @@
     </main>
 
     <!-- 页脚 -->
-  
+    <footer class="site-footer">
+      <div class="footer-container">
+        <h2 class="footer-title">Gregorwang - 2025 WORLD</h2>
+        <p class="footer-copyright">汪家俊个人所有 © Copyright</p>
+        <div class="footer-locations">
+          <p>中国 山东 青岛</p>
+          <span class="location-divider">|</span>
+          <p>中国 湖北 鄂州</p>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
