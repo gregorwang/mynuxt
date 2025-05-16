@@ -153,8 +153,8 @@ import biliImage from '~/assets/bili.png'
 import xhsImage from '~/assets/xhs.png'
 import qr198 from '~/assets/198.png'
 import qr125 from '~/assets/125.png'
-import yhjImage from '~/assets/yhj.jpg'
-import pexelsPokRieImage from '~/assets/pexels-pok-rie-33563-2049422.jpg'
+const yhjImage = "https://gregorwang.oss-cn-qingdao.aliyuncs.com/yhj.jpg"
+const pexelsPokRieImage = "https://gregorwang.oss-cn-qingdao.aliyuncs.com/pexels-pok-rie-33563-2049422.jpg"
 import pexelsArnieChouImage from '~/assets/pexels-arnie-chou-304906-1229042.jpg'
 
 
@@ -162,15 +162,15 @@ const currentImageIndex = ref(0)
 const images = ref([
   {
     src: yhjImage,
-    text: '本网站云服务器由谷歌公司提供3个月的免费试用，感谢他们，薅完谷歌的羊毛再准备薅aws了',
+    text: '由阿里云ecs，oss，cdn，域名提供服务，本网站已完成互联网备案合法合规',
   },
   {
     src: pexelsPokRieImage,
-    text: '该网站主要由chatgpt4o和Gemini 1.5flash完成。<br>"小tips：我只负责复制粘贴，纯手写写不出来"',
+    text: '该网站主要由chatgpt，trae和cursor等aicode软件生成。<br>"小tips：我只负责复制粘贴，纯手写写不出来"',
   },
   {
     src: pexelsArnieChouImage,
-    text: '大模型的能力太夸张了，以后这个失业率不敢想象。<br>"gregorwang是企业微信的id，icu是最便宜的域名，一年才8元钱."',
+    text: '网站建构纯娱乐。<br>"后续可能存在不可抗力原因本网站直接倒闭."',
   },
 ])
 
@@ -199,7 +199,7 @@ onMounted(() => {
 
 <style scoped>
 .hero {
-  background-image: url('~/assets/iuo.jpg');
+  background-image: url('https://gregorwang.oss-cn-qingdao.aliyuncs.com/iuo.jpg');
 }
 .dropdown-content a:hover {
   @apply bg-gray-200;
@@ -249,7 +249,7 @@ dl dd:hover .layer {
 }
 .hero {
   @apply bg-cover bg-center bg-no-repeat w-full h-screen relative text-white text-center transition-all duration-500 ease-in-out;
-  background-image: url('~/assets/iuo.jpg');
+  background-image: url('https://gregorwang.oss-cn-qingdao.aliyuncs.com/iuo.jpg');
 }
 .hero-text {
   @apply absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-transparent p-5 text-center;
