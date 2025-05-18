@@ -16,7 +16,7 @@
       <div class="gradient-overlay"></div>
       <div class="hero-text-content">
         <h1 class="main-title">
-          <span class="title-main-text">光影瞬间</span>
+          <span class="title-main-text">光影瞬间</span> <!-- 您可以修改这里的标题 -->
           <span class="title-year">探索集</span>
         </h1>
         <p class="subtitle">
@@ -26,9 +26,9 @@
       <div class="curved-bottom"></div>
     </div>
 
-    <!-- Content Section -->
+    <!-- Content Section (恢复原有逻辑) -->
     <div class="content-section">
-      <h2 class="content-title">影像故事：捕捉世界的色彩</h2>
+      <h2 class="content-title">影像故事：捕捉世界的色彩</h2> <!-- 您可以修改这里的标题 -->
       <div class="content-body">
         <div class="text-column">
           <p>
@@ -46,13 +46,14 @@
           </button>
         </div>
         <div class="image-column">
+          <!-- 从 assets 文件夹中引用图片 -->
           <img src="~/assets/Sekiro-conceptart-14.jpg" alt="内容图片1" class="content-image" />
           <img src="~/assets/yhj.jpg" alt="内容图片2" class="content-image" />
         </div>
       </div>
     </div>
 
-    <!-- Details Section -->
+    <!-- New Details Section -->
     <div class="details-section">
       <div class="details-image-column">
         <img src="~/assets/image5.jpg" alt="Details Image" class="details-image" />
@@ -81,22 +82,26 @@
         <button class="details-button">Itinerary</button>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'; // 如果在 Nuxt 3 中使用，Nuxt 2 中通常不需要显式导入
 
-const router = useRouter();
+const router = useRouter(); // Nuxt 3
+// const router = useNuxtApp().$router; // 另一种 Nuxt 3 获取 router 的方式
+// 在 Nuxt 2 中，可以直接使用 this.$router (在选项式 API 中) 或通过 context (在 setup 中)
 
 function navigateToMoreInfo() {
-  router.push('/more-info');
+  // 您可以根据需要修改此路由
+  router.push('/more-info'); // 示例路由
 }
 </script>
 
 <style scoped>
 .page-container {
-  background-color: #f0f2f5;
+  background-color: #f0f2f5; /* Light background for the page below hero */
   overflow-x: hidden;
 }
 
@@ -104,9 +109,9 @@ function navigateToMoreInfo() {
 .hero-section {
   position: relative;
   width: 100vw;
-  height: 70vh;
+  height: 70vh; /* 调整为之前的高度或您期望的高度 */
   overflow: hidden;
-  background-color: #000;
+  background-color: #000; /* Fallback color */
 }
 
 .hero-background-image {
@@ -185,21 +190,22 @@ function navigateToMoreInfo() {
   left: 0;
   width: 100%;
   height: 80px; 
-  background-color: #f0f2f5;
+  background-color: #f0f2f5; /* Match page content background */
   border-top-left-radius: 50% 100%; 
   border-top-right-radius: 50% 100%; 
   transform: scaleX(1.5); 
-  z-index: 1;
+  z-index: 1; /* Adjusted z-index as sub-nav is removed */
 }
 
-/* Content Section Styles */
+
+/* Content Section Styles (Restored) */
 .content-section {
-  padding: 80px 5% 50px;
+  padding: 80px 5% 50px; /* Adjust padding, top padding accounts for curve */
   max-width: 1200px;
   margin: 0 auto;
-  background-color: #f0f2f5;
+  background-color: #f0f2f5; /* Ensure this matches curved-bottom */
   position: relative; 
-  z-index: 0;
+  z-index: 0; /* Ensure it's behind the curve if needed, or adjust curve's z-index */
 }
 
 .content-title {
@@ -273,41 +279,41 @@ function navigateToMoreInfo() {
   transform: translateX(5px);
 }
 
-/* Details Section Styles */
+/* New Details Section Styles */
 .details-section {
   display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
-  padding: 50px 5%;
-  max-width: 1200px;
-  margin: 0 auto;
-  background-color: #ffffff;
+  flex-wrap: wrap; /* 允许在小屏幕上换行 */
+  gap: 40px; /* 图片和文字之间的间距 */
+  padding: 50px 5%; /* 上下和左右内边距 */
+  max-width: 1200px; /* 最大宽度，与 content-section 保持一致 */
+  margin: 0 auto; /* 居中显示 */
+  background-color: #ffffff; /* 根据图片，背景似乎是白色 */
 }
 
 .details-image-column {
-  flex: 1;
-  min-width: 300px;
+  flex: 1; /* 图片列占据可用空间的一份 */
+  min-width: 300px; /* 图片列最小宽度 */
   display: flex;
-  align-items: flex-start;
+  align-items: flex-start; /* 图片顶部对齐 */
 }
 
 .details-image {
   width: 100%;
-  max-width: 450px;
+  max-width: 450px; /* 根据图片内容调整图片最大宽度 */
   height: auto;
-  object-fit: cover;
-  border-radius: 8px;
+  object-fit: cover; /* 保持图片比例 */
+  border-radius: 8px; /* 轻微圆角 */
 }
 
 .details-text-column {
-  flex: 1.5;
-  min-width: 300px;
-  color: #333;
-  font-family: Arial, sans-serif;
+  flex: 1.5; /* 文字列占据可用空间的一份半，比图片列稍宽 */
+  min-width: 300px; /* 文字列最小宽度 */
+  color: #333; /* 文字颜色 */
+  font-family: Arial, sans-serif; /* 字体 */
 }
 
 .details-main-title {
-  font-size: 2.2rem;
+  font-size: 2.2rem; /* "Details" 标题字号 */
   font-weight: bold;
   margin-bottom: 20px;
 }
@@ -319,46 +325,47 @@ function navigateToMoreInfo() {
 }
 
 .details-text-column p {
-  font-size: 0.95rem;
+  font-size: 0.95rem; /* 普通段落字号 */
   line-height: 1.6;
-  margin-bottom: 8px;
+  margin-bottom: 8px; /* 段落间距 */
 }
 
 .not-included-title {
-  margin-top: 20px;
+  margin-top: 20px; /* "Not Included:" 与上方内容的间距 */
   font-weight: bold;
   font-size: 1rem;
 }
 
 .not-included-list {
-  list-style-type: disc;
-  padding-left: 20px;
+  list-style-type: disc; /* 使用圆点作为列表项标记 */
+  padding-left: 20px; /* 列表左侧内边距 */
   margin-top: 5px;
   font-size: 0.95rem;
 }
 
 .not-included-list li {
-  margin-bottom: 5px;
+  margin-bottom: 5px; /* 列表项间距 */
 }
 
 .details-button {
-  background-color: #2c3e50;
-  color: white;
+  background-color: #2c3e50; /* 深蓝色背景 */
+  color: white; /* 白色文字 */
   border: none;
-  padding: 12px 35px;
+  padding: 12px 35px; /* 内边距 */
   font-size: 1rem;
   font-weight: bold;
   letter-spacing: 0.5px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 5px; /* 圆角 */
   transition: background-color 0.3s ease;
-  margin-top: 30px;
-  display: inline-block;
+  margin-top: 30px; /* 按钮与上方内容的间距 */
+  display: inline-block; /* 使按钮可以设置上下 margin */
 }
 
 .details-button:hover {
-  background-color: #34495e;
+  background-color: #34495e; /* 鼠标悬停时颜色变深 */
 }
+
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -366,24 +373,24 @@ function navigateToMoreInfo() {
     height: 60vh;
   }
   .curved-bottom {
-    height: 50px;
+    height: 50px; 
   }
   .content-section {
-    padding-top: 60px;
+    padding-top: 60px; /* Adjust if curve height changes */
   }
-  .content-body {
+   .content-body {
     flex-direction: column;
   }
   .details-section {
-    flex-direction: column;
+    flex-direction: column; /* 在小屏幕上，图片和文字垂直排列 */
     padding: 30px 5%;
   }
   .details-image-column {
-    align-items: center;
-    margin-bottom: 20px;
+    align-items: center; /* 图片居中 */
+    margin-bottom: 20px; /* 图片和文字之间的间距 */
   }
   .details-image {
-    max-width: 100%;
+    max-width: 100%; /* 图片宽度适应容器 */
   }
 }
 
@@ -448,7 +455,7 @@ function navigateToMoreInfo() {
 
 /* 为了确保导航栏不会遮挡内容，给页面容器添加上边距 */
 .page-container {
-  padding-top: 0;
+  padding-top: 0; /* 不需要额外的顶部内边距，因为hero section已经占据了足够空间 */
 }
 
 /* 响应式调整 */
@@ -457,6 +464,7 @@ function navigateToMoreInfo() {
     padding: 10px;
     flex-wrap: wrap;
   }
+  
   .nav-item {
     margin: 5px;
     font-size: 0.9rem;
@@ -466,6 +474,5 @@ function navigateToMoreInfo() {
 
 /* 确保其他样式保持不变 */
 </style>
-
   
 

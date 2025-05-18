@@ -1,12 +1,12 @@
 <template>
   <div class="flex flex-col min-h-screen bg-[#FAF9F5]">
     <!-- 顶部导航栏 -->
-    <header class="py-3 px-4 border-b border-gray-200" style="background-color: #FAF9F5;">
+    <header class="py-3 px-4 border-b border-gray-200 bg-white">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
-        <a href="/" class="flex items-center">
+        <div class="flex items-center">
           <img src="/claude-logo.svg" alt="Claude Logo" class="h-8 w-8 mr-2" />
           <h1 class="text-lg font-medium text-gray-800">Claude</h1>
-        </a>
+        </div>
         <div class="flex items-center gap-2">
           <button class="p-2 text-gray-500 hover:text-gray-700 rounded-md hover:bg-gray-100">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
